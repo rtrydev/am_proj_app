@@ -1,9 +1,12 @@
+import 'package:am_proj_app/dependency_injection.dart';
 import 'package:am_proj_app/routes/login.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  configureDependencies();
+
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
       .then((value) => runApp(MyApp()));
 }

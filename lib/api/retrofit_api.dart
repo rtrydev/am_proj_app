@@ -2,14 +2,13 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../main.dart';
+
 class RetrofitApi {
   static Dio dio = Dio();
-  static BuildContext? _context;
   static final RetrofitApi _retrofitApi = RetrofitApi._internal();
 
-  factory RetrofitApi(BuildContext context) {
-    _context = context;
-
+  factory RetrofitApi() {
     return _retrofitApi;
   }
 
@@ -27,6 +26,8 @@ class RetrofitApi {
               request.headers['Authorization'] = 'Bearer $token';
             }
           });
+
+          return handler.next(request);
         },
 
         onResponse: (response, handler) {
@@ -41,10 +42,6 @@ class RetrofitApi {
           SharedPreferences
             .getInstance()
             .then((prefs) => prefs.setString('token', ''));
-
-          if (_context != null) {
-            Navigator.pushReplacementNamed(_context!, '/login');
-          }
         }
       )
     );
