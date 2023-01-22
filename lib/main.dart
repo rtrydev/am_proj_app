@@ -1,5 +1,6 @@
 import 'package:am_proj_app/dependency_injection.dart';
 import 'package:am_proj_app/routes/login.dart';
+import 'package:am_proj_app/routes/main_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -21,7 +22,8 @@ class MyApp extends StatelessWidget {
       title: 'AM Project',
       initialRoute: '/login',
       routes: {
-        '/login': (context) => Login()
+        '/login': (context) => Login(),
+        '/': (context) => MainScreen()
       },
     );
   }

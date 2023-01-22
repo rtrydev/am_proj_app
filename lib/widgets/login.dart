@@ -41,11 +41,7 @@ class _LoginFormState extends State<LoginForm> {
         password: passwordTextController.text
     );
 
-    showDialog(context: context, builder: (context) {
-      return AlertDialog(
-        content: Text(loginResult.auth_token ?? 'failed'),
-      );
-    });
+    await Navigator.pushReplacementNamed(context, '/');
 
     setState(() {
       isLoggingIn = false;
