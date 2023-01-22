@@ -32,12 +32,14 @@ class _LoginFormState extends State<LoginForm> {
         padding: const EdgeInsets.symmetric(vertical: 40.0, horizontal: 80.0),
         child: Column(
           children: const [
-            Text('test', style: TextStyle(fontSize: 16, color: Colors.white, fontStyle: FontStyle.normal))
+            Text('test', style: TextStyle(fontSize: 16))
           ],
         )
       )
     );
 
-    return loginFormBody;
+    return Scaffold(
+      body: loginFormBody,
+    );
   }
 }
