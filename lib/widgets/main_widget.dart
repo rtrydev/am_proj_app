@@ -43,9 +43,9 @@ class _MainWidgetState extends State<MainWidget> {
     );
 
     return Scaffold(
-      appBar: AppBar(title: const Text('test'),),
+      appBar: AppBar(title: const Text('AM Project Game'),),
       drawer: drawer,
-      body: const MapSample(),
+      body: const GameMap(),
     );
   }
 }

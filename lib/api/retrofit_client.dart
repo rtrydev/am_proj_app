@@ -1,3 +1,4 @@
+import 'package:am_proj_app/models/waypoint_data.dart';
 import 'package:dio/dio.dart';
 import 'package:am_proj_app/models/login_data.dart';
 import 'package:am_proj_app/models/login_result.dart';
@@ -11,4 +12,8 @@ abstract class RestClient {
 
   @POST("/users/login")
   Future<LoginResult> loginUser(@Body() LoginData loginData);
+
+
+  @GET("/waypoints")
+  Future<List<WaypointData>> getWaypoints();
 }
