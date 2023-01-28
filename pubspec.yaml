@@ -18,6 +18,8 @@ dependencies:
   injectable: ^2.1.0
   get_it: ^7.2.0
   google_maps_flutter: ^2.2.3
+  geolocator: ^9.0.2
+  permission_handler: ^10.2.0
 
 dev_dependencies:
   flutter_test:
