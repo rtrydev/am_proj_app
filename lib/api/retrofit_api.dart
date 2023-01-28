@@ -35,6 +35,7 @@ class RetrofitApi {
         },
 
         onError: (error, handler) {
+          print(error);
           if (error.response?.statusCode != 401) {
             return;
           }

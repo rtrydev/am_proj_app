@@ -45,6 +45,29 @@ class _RestClient implements RestClient {
   }
 
   @override
+  Future<UserData> getUser() async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    final _result =
+        await _dio.fetch<Map<String, dynamic>>(_setStreamType<UserData>(Options(
+      method: 'GET',
+      headers: _headers,
+      extra: _extra,
+    )
+            .compose(
+              _dio.options,
+              '/users',
+              queryParameters: queryParameters,
+              data: _data,
+            )
+            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    final value = UserData.fromJson(_result.data!);
+    return value;
+  }
+
+  @override
   Future<List<WaypointData>> getWaypoints() async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
@@ -66,6 +89,53 @@ class _RestClient implements RestClient {
     var value = _result.data!
         .map((dynamic i) => WaypointData.fromJson(i as Map<String, dynamic>))
         .toList();
+    return value;
+  }
+
+  @override
+  Future<WaypointEvent> initializeEvent(initData) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    _data.addAll(initData.toJson());
+    final _result = await _dio
+        .fetch<Map<String, dynamic>>(_setStreamType<WaypointEvent>(Options(
+      method: 'POST',
+      headers: _headers,
+      extra: _extra,
+    )
+            .compose(
+              _dio.options,
+              '/waypoint_events',
+              queryParameters: queryParameters,
+              data: _data,
+            )
+            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    final value = WaypointEvent.fromJson(_result.data!);
+    return value;
+  }
+
+  @override
+  Future<Question> getQuestionForEvent(eventId) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    final _result =
+        await _dio.fetch<Map<String, dynamic>>(_setStreamType<Question>(Options(
+      method: 'GET',
+      headers: _headers,
+      extra: _extra,
+    )
+            .compose(
+              _dio.options,
+              '/waypoint_events/:eventId/question',
+              queryParameters: queryParameters,
+              data: _data,
+            )
+            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    final value = Question.fromJson(_result.data!);
     return value;
   }
 
