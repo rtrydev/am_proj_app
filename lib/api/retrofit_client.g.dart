@@ -107,7 +107,7 @@ class _RestClient implements RestClient {
     )
             .compose(
               _dio.options,
-              '/waypoint_events',
+              '/waypoint_events/',
               queryParameters: queryParameters,
               data: _data,
             )
@@ -130,7 +130,7 @@ class _RestClient implements RestClient {
     )
             .compose(
               _dio.options,
-              '/waypoint_events/:eventId/question',
+              '/waypoint_events/${eventId}/question',
               queryParameters: queryParameters,
               data: _data,
             )

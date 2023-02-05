@@ -15,18 +15,18 @@ class MainWidget extends StatefulWidget {
 }
 
 class _MainWidgetState extends State<MainWidget> {
-  UserData? currentUser;
+  late Future<UserData> currentUser;
   final IUserService userService = getIt<IUserService>();
 
   @override
+  void initState() {
+    super.initState();
+    currentUser = userService.getUser();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    userService.getUser()
-      .then((user) {
-        setState(() {
-          currentUser = user;
-        });
-      }
-    );
+
 
     var drawer = Drawer(
       child: ListView(
@@ -37,7 +37,13 @@ class _MainWidgetState extends State<MainWidget> {
             decoration: const BoxDecoration(
               color: Colors.blue,
             ),
-            child: Text(currentUser?.username ?? '', style: const TextStyle(color: Colors.white, fontSize: 24),),
+            child: FutureBuilder<UserData>(future: currentUser, builder: (BuildContext context, AsyncSnapshot<UserData> snapshot) {
+              if(snapshot.hasData) {
+                return Text(snapshot.data?.username ?? '', style: const TextStyle(color: Colors.white, fontSize: 24));
+              } else {
+                return const Text("");
+              }
+            },),
           ),
           ListTile(
             title: const Text('Odwiedzone punkty'),

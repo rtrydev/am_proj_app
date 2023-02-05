@@ -23,8 +23,8 @@ abstract class RestClient {
   @GET("/waypoints")
   Future<List<WaypointData>> getWaypoints();
 
-  @POST("/waypoint_events")
+  @POST("/waypoint_events/")
   Future<WaypointEvent> initializeEvent(@Body() WaypointEventInitData initData);
-  @GET("/waypoint_events/:eventId/question")
+  @GET("/waypoint_events/{eventId}/question")
   Future<Question> getQuestionForEvent(@Path() String eventId);
 }

@@ -22,8 +22,7 @@ class MyApp extends StatelessWidget {
       title: 'AM Project',
       initialRoute: '/login',
       routes: {
-        '/login': (context) => Login(),
-        '/': (context) => MainScreen()
+        '/login': (context) => Login()
       },
     );
   }

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../dependency_injection.dart';
 import '../models/waypoint_data.dart';
@@ -31,34 +32,53 @@ class GameMapState extends State<GameMap> {
   final IWaypointService waypointService = getIt<IWaypointService>();
   final IWaypointEventService waypointEventService = getIt<IWaypointEventService>();
 
-  checkWaypointProximity() {
+  checkWaypointProximity() async {
+    final sharedPreferences = await SharedPreferences.getInstance();
+    if (sharedPreferences.getString("token") == "") {
+      return;
+    }
+
     Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
         .then((position) {
           double lat = position.latitude;
           double long = position.longitude;
+          print("get position " + (new DateTime.now()).toString());
 
-          for(int i = 0; i < waypoints.length; i++) {
-            final waypointLat = waypoints[i].coordinateX;
-            final waypointLong = waypoints[i].coordinateY;
+          Marker? markerToDelete = null;
 
-            if ((lat - waypointLat).abs() < 0.001 && (long - waypointLong).abs() < 0.001) {
+          for (var marker in markers) {
+            final markerId = marker.markerId.value;
+            print(markerId);
 
-              print("close to " + waypoints[i].title);
-              waypointEventService.initialize(waypoints[i].id)
-                .then((event) {
-                  setState(() {
-                    waypoints.removeAt(i);
-                  });
+            var markerWaypoint = waypoints.firstWhere((element) => element.id == markerId,
+                orElse: () => WaypointData(id: "", coordinateX: 0, coordinateY: 0, description: "", title: ""));
 
-                  print(event.event_id);
-
-                  waypointEventService.getQuestion(event.event_id)
-                    .then((question) {
-                      print(question.contents);
-                    });
-
-                });
+            if (markerWaypoint.id == "") {
+              continue;
             }
+
+            if ((lat - markerWaypoint.coordinateX).abs() < 0.001 && (long - markerWaypoint.coordinateY).abs() < 0.001) {
+              print("close to " + markerId);
+              markerToDelete = marker;
+            }
+          }
+
+          if (markerToDelete != null) {
+            setState(() {
+              markers.remove(markerToDelete);
+            });
+            print("starting event on " + markerToDelete.markerId.value);
+
+            waypointEventService.initialize(markerToDelete.markerId.value)
+              .then((event) {
+                print("started event");
+                print(event.event_id);
+
+                waypointEventService.getQuestion(event.event_id)
+                  .then((question) {
+                    print(question.contents);
+                  });
+              });
           }
     });
   }
@@ -66,44 +86,53 @@ class GameMapState extends State<GameMap> {
   @override
   void initState() {
     super.initState();
-    timer = Timer.periodic(const Duration(seconds: 3), (Timer t) => checkWaypointProximity());
+
+    [
+      Permission.locationWhenInUse
+    ].request().then(
+      (result) {
+        if (result.isNotEmpty) {
+          Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
+              .then((position) {
+            double lat = position.latitude;
+            double long = position.longitude;
+
+            setState(() {
+              locationEnabled = true;
+              location = LatLng(lat, long);
+            });
+          });
+        }
+      }
+    );
+
+    waypointService.getWaypoints().then((result) {
+      setState(() {
+        waypoints = result;
+        markers = result.map(
+            (waypoint) => Marker(
+              markerId: MarkerId(waypoint.id),
+              position: LatLng(waypoint.coordinateX, waypoint.coordinateY)
+            )
+        ).toSet();
+      });
+    });
+
+    if (timer != null) {
+      return;
+    }
+
+    timer = Timer.periodic(const Duration(seconds: 3), (Timer t) async => await checkWaypointProximity());
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    [
-      Permission.locationWhenInUse
-    ].request().then(
-        (result) {
-          if (result.isNotEmpty) {
-            Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
-              .then((position) {
-                double lat = position.latitude;
-                double long = position.longitude;
-
-                setState(() {
-                  locationEnabled = true;
-                  location = LatLng(lat, long);
-                });
-            });
-          }
-        }
-    );
-
-    waypointService.getWaypoints()
-      .then((result) {
-        setState(() {
-          waypoints = result;
-          markers = result.map(
-                  (waypoint) =>
-                  Marker(
-                      markerId: MarkerId(waypoint.id),
-                      position: LatLng(waypoint.coordinateX, waypoint.coordinateY)
-                  )
-          ).toSet();
-        });
-      });
-
     return Scaffold(
       body: GoogleMap(
         mapType: MapType.normal,

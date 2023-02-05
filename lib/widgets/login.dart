@@ -1,4 +1,5 @@
 import 'package:am_proj_app/dependency_injection.dart';
+import 'package:am_proj_app/routes/main_screen.dart';
 import 'package:am_proj_app/services/i_user_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -41,7 +42,9 @@ class _LoginFormState extends State<LoginForm> {
         password: passwordTextController.text
     );
 
-    await Navigator.pushReplacementNamed(context, '/');
+    await Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => MainScreen())
+    );
 
     setState(() {
       isLoggingIn = false;
