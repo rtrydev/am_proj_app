@@ -1,3 +1,4 @@
+import 'package:am_proj_app/models/question_answer_data.dart';
 import 'package:am_proj_app/models/user_data.dart';
 import 'package:am_proj_app/models/waypoint_data.dart';
 import 'package:am_proj_app/models/waypoint_event_init_data.dart';
@@ -27,4 +28,7 @@ abstract class RestClient {
   Future<WaypointEvent> initializeEvent(@Body() WaypointEventInitData initData);
   @GET("/waypoint_events/{eventId}/question")
   Future<Question> getQuestionForEvent(@Path() String eventId);
+
+  @POST("/question_answers/")
+  Future answerQuestion(@Body() QuestionAnswerData questionAnswerData);
 }

@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:am_proj_app/models/question_answer_data.dart';
+import 'package:am_proj_app/services/i_question_answer_service.dart';
 import 'package:am_proj_app/services/i_waypoint_event_service.dart';
 import 'package:am_proj_app/services/i_waypoint_service.dart';
 import 'package:flutter/material.dart';
@@ -31,6 +33,12 @@ class GameMapState extends State<GameMap> {
 
   final IWaypointService waypointService = getIt<IWaypointService>();
   final IWaypointEventService waypointEventService = getIt<IWaypointEventService>();
+  final IQuestionAnswerService questionAnswerService = getIt<IQuestionAnswerService>();
+
+  answerQuestion(String questionId, String answerId, String eventId) async {
+    final questionAnswerData = QuestionAnswerData(question_id: questionId, answer_id: answerId, event_id: eventId);
+    await questionAnswerService.answerQuestion(questionAnswerData: questionAnswerData);
+  }
 
   checkWaypointProximity() async {
     final sharedPreferences = await SharedPreferences.getInstance();
@@ -42,13 +50,11 @@ class GameMapState extends State<GameMap> {
         .then((position) {
           double lat = position.latitude;
           double long = position.longitude;
-          print("get position " + (new DateTime.now()).toString());
 
           Marker? markerToDelete = null;
 
           for (var marker in markers) {
             final markerId = marker.markerId.value;
-            print(markerId);
 
             var markerWaypoint = waypoints.firstWhere((element) => element.id == markerId,
                 orElse: () => WaypointData(id: "", coordinateX: 0, coordinateY: 0, description: "", title: ""));
@@ -58,7 +64,6 @@ class GameMapState extends State<GameMap> {
             }
 
             if ((lat - markerWaypoint.coordinateX).abs() < 0.001 && (long - markerWaypoint.coordinateY).abs() < 0.001) {
-              print("close to " + markerId);
               markerToDelete = marker;
             }
           }
@@ -67,16 +72,48 @@ class GameMapState extends State<GameMap> {
             setState(() {
               markers.remove(markerToDelete);
             });
-            print("starting event on " + markerToDelete.markerId.value);
 
             waypointEventService.initialize(markerToDelete.markerId.value)
               .then((event) {
-                print("started event");
-                print(event.event_id);
-
                 waypointEventService.getQuestion(event.event_id)
                   .then((question) {
-                    print(question.contents);
+                    showDialog(context: context, builder: (context) {
+                      return AlertDialog(
+                        content: Container(
+                          height: 250,
+                          child: Column(
+                            children: [
+                              Text(question.contents, style: const TextStyle(fontSize: 18),),
+                              const SizedBox(height: 50),
+                              TextButton(
+                                  style: TextButton.styleFrom(backgroundColor: Colors.grey),
+                                  onPressed: () async {
+                                    await answerQuestion(question.id, question.answers[0]["id"], event.event_id);
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Text(question.answers[0]["text"], style: const TextStyle(color: Colors.white),)
+                              ),
+                              TextButton(
+                                  style: TextButton.styleFrom(backgroundColor: Colors.grey),
+                                  onPressed: () async {
+                                    await answerQuestion(question.id, question.answers[1]["id"], event.event_id);
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Text(question.answers[1]["text"], style: const TextStyle(color: Colors.white))
+                              ),
+                              TextButton(
+                                  style: TextButton.styleFrom(backgroundColor: Colors.grey),
+                                  onPressed: () async {
+                                    await answerQuestion(question.id, question.answers[2]["id"], event.event_id);
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Text(question.answers[2]["text"], style: const TextStyle(color: Colors.white))
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    });
                   });
               });
           }
