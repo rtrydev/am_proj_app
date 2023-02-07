@@ -1,3 +1,4 @@
+import 'package:am_proj_app/widgets/visited_waypoints.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -17,6 +18,8 @@ class MainWidget extends StatefulWidget {
 class _MainWidgetState extends State<MainWidget> {
   late Future<UserData> currentUser;
   final IUserService userService = getIt<IUserService>();
+
+  Widget currentBody = const GameMap();
 
   @override
   void initState() {
@@ -46,19 +49,21 @@ class _MainWidgetState extends State<MainWidget> {
             },),
           ),
           ListTile(
-            title: const Text('Odwiedzone punkty'),
+            title: const Text('Mapa'),
             onTap: () {
-              // Update the state of the app.
-              // ...
+              setState(() {
+                currentBody = const GameMap();
+              });
             },
           ),
           ListTile(
-            title: const Text('Odpowiedzi'),
+            title: const Text('Odwiedzone punkty'),
             onTap: () {
-              // Update the state of the app.
-              // ...
+              setState(() {
+                currentBody = const VisitedWaypoints();
+              });
             },
-          ),
+          )
         ],
       ),
     );
@@ -66,7 +71,7 @@ class _MainWidgetState extends State<MainWidget> {
     return Scaffold(
       appBar: AppBar(title: const Text('AM Project Game'),),
       drawer: drawer,
-      body: const GameMap(),
+      body: currentBody,
     );
   }
 }

@@ -144,14 +144,18 @@ class GameMapState extends State<GameMap> {
     );
 
     waypointService.getWaypoints().then((result) {
-      setState(() {
-        waypoints = result;
-        markers = result.map(
-            (waypoint) => Marker(
-              markerId: MarkerId(waypoint.id),
-              position: LatLng(waypoint.coordinateX, waypoint.coordinateY)
-            )
-        ).toSet();
+      waypointEventService.getEventsForUser().then((events) {
+        final filteredWaypoints = result.where((element) => !events.any((event) => event.waypoint_id == element.id));
+
+        setState(() {
+          waypoints = filteredWaypoints.toList();
+          markers = filteredWaypoints.map(
+                  (waypoint) => Marker(
+                  markerId: MarkerId(waypoint.id),
+                  position: LatLng(waypoint.coordinateX, waypoint.coordinateY)
+              )
+          ).toSet();
+        });
       });
     });
 

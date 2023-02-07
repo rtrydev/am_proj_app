@@ -9,10 +9,11 @@ import 'package:retrofit/retrofit.dart';
 
 import '../models/question.dart';
 import '../models/waypoint_event.dart';
+import '../models/waypoint_event_data.dart';
 
 part 'retrofit_client.g.dart';
 
-@RestApi(baseUrl: 'http://10.0.2.2/')
+@RestApi(baseUrl: 'http://127.0.0.1/')
 abstract class RestClient {
   factory RestClient(Dio dio, {String baseUrl}) = _RestClient;
 
@@ -23,11 +24,15 @@ abstract class RestClient {
 
   @GET("/waypoints")
   Future<List<WaypointData>> getWaypoints();
+  @GET("/waypoints/{waypointId}")
+  Future<WaypointData> getWaypointById(@Path() String waypointId);
 
   @POST("/waypoint_events/")
   Future<WaypointEvent> initializeEvent(@Body() WaypointEventInitData initData);
   @GET("/waypoint_events/{eventId}/question")
   Future<Question> getQuestionForEvent(@Path() String eventId);
+  @GET("/waypoint_events")
+  Future<List<WaypointEventData>> getEventsForUser();
 
   @POST("/question_answers/")
   Future answerQuestion(@Body() QuestionAnswerData questionAnswerData);

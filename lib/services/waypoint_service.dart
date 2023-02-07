@@ -18,4 +18,15 @@ class WaypointService implements IWaypointService {
     return waypoints;
   }
 
+  @override
+  Future<WaypointData> getWaypointById(String id) async {
+    final api = RetrofitApi();
+    final dio = await api.getApiClient();
+    final client = RestClient(dio);
+
+    final waypoints = await client.getWaypointById(id);
+
+    return waypoints;
+  }
+
 }

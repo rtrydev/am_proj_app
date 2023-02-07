@@ -13,7 +13,7 @@ class _RestClient implements RestClient {
     this._dio, {
     this.baseUrl,
   }) {
-    baseUrl ??= 'http://10.0.2.2/';
+    baseUrl ??= 'http://127.0.0.1/';
   }
 
   final Dio _dio;
@@ -93,6 +93,29 @@ class _RestClient implements RestClient {
   }
 
   @override
+  Future<WaypointData> getWaypointById(waypointId) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    final _result = await _dio
+        .fetch<Map<String, dynamic>>(_setStreamType<WaypointData>(Options(
+      method: 'GET',
+      headers: _headers,
+      extra: _extra,
+    )
+            .compose(
+              _dio.options,
+              '/waypoints/${waypointId}',
+              queryParameters: queryParameters,
+              data: _data,
+            )
+            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    final value = WaypointData.fromJson(_result.data!);
+    return value;
+  }
+
+  @override
   Future<WaypointEvent> initializeEvent(initData) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
@@ -136,6 +159,32 @@ class _RestClient implements RestClient {
             )
             .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
     final value = Question.fromJson(_result.data!);
+    return value;
+  }
+
+  @override
+  Future<List<WaypointEventData>> getEventsForUser() async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    final _result = await _dio
+        .fetch<List<dynamic>>(_setStreamType<List<WaypointEventData>>(Options(
+      method: 'GET',
+      headers: _headers,
+      extra: _extra,
+    )
+            .compose(
+              _dio.options,
+              '/waypoint_events',
+              queryParameters: queryParameters,
+              data: _data,
+            )
+            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    var value = _result.data!
+        .map((dynamic i) =>
+            WaypointEventData.fromJson(i as Map<String, dynamic>))
+        .toList();
     return value;
   }
 

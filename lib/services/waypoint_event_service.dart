@@ -1,5 +1,6 @@
 import 'package:am_proj_app/models/question.dart';
 import 'package:am_proj_app/models/waypoint_event.dart';
+import 'package:am_proj_app/models/waypoint_event_data.dart';
 import 'package:am_proj_app/models/waypoint_event_init_data.dart';
 import 'package:injectable/injectable.dart';
 import 'package:http/http.dart' as http;
@@ -31,6 +32,17 @@ class WaypointEventService implements IWaypointEventService {
     final client = RestClient(dio);
 
     final result = await client.getQuestionForEvent(eventId);
+
+    return result;
+  }
+
+  @override
+  Future<List<WaypointEventData>> getEventsForUser() async {
+    final api = RetrofitApi();
+    final dio = await api.getApiClient();
+    final client = RestClient(dio);
+
+    final result = await client.getEventsForUser();
 
     return result;
   }
